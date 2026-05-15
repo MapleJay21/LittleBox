@@ -1,6 +1,6 @@
-import {HeroSection} from "@/components/landing/hero-section";
+import { HeroSection } from "../../components/landing/hero-section";
 
-export default function Home() {
+export function HomePage() {
   return (
     <main className="relative min-h-screen overflow-x-hidden noise-overlay">
       <HeroSection />

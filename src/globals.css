@@ -188,4 +188,81 @@
       linear-gradient(135deg, var(--foreground) 25%, transparent 25%, transparent 50%, var(--foreground) 50%, var(--foreground) 75%, transparent 75%) border-box;
     background-size: 100% 100%, 8px 8px;
   }
+
+  .fluid-button {
+    --fb-first-text: rgb(250, 250, 250);
+    --fb-second-text: rgb(1, 1, 1);
+    --fb-overlay: rgb(250, 250, 250);
+    --fb-border: rgb(250, 250, 250);
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 210px;
+    padding: 25px 50px;
+    border: 2px solid var(--fb-border);
+    border-radius: 999px;
+    overflow: hidden;
+    text-decoration: none;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .fluid-button__label-stack {
+    position: relative;
+    height: 19px;
+    overflow: hidden;
+    z-index: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fluid-button__label {
+    font-family: "Montserrat", "Montserrat Placeholder", system-ui, sans-serif;
+    font-size: calc(var(--framer-root-font-size, 1rem) * 1.1);
+    font-weight: 500;
+    line-height: 1em;
+    white-space: pre;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0, 1), color 0.5s cubic-bezier(0.4, 0, 0, 1);
+  }
+
+  .fluid-button__label--top {
+    color: var(--fb-first-text);
+    transform: translateY(0);
+  }
+
+  .fluid-button__label--bottom {
+    color: var(--fb-second-text);
+    position: absolute;
+    left: 0;
+    right: 0;
+    transform: translateY(19px);
+    text-align: center;
+  }
+
+  .fluid-button__overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -75px;
+    height: 69px;
+    border-radius: 50%;
+    background: var(--fb-overlay);
+    z-index: 0;
+    transition: bottom 0.5s cubic-bezier(0.4, 0, 0, 1), border-radius 0.5s cubic-bezier(0.4, 0, 0, 1);
+  }
+
+  .fluid-button:hover .fluid-button__overlay {
+    bottom: 0;
+    border-radius: 0;
+  }
+
+  .fluid-button:hover .fluid-button__label--top {
+    transform: translateY(-19px);
+  }
+
+  .fluid-button:hover .fluid-button__label--bottom {
+    transform: translateY(0);
+  }
 }

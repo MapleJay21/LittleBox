@@ -118,8 +118,6 @@ export function PixelButton({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const startTime = performance.now();
-
     const render = (time: number) => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       const shouldShow = isHovered || pixelAnimationMode === "always";
@@ -127,7 +125,6 @@ export function PixelButton({
 
       for (const pixel of pixelsRef.current) {
         const target = shouldShow ? pixel.maxSize : 0;
-        const elapsed = Math.max(0, time - startTime - pixel.delay);
         const shimmer = shouldShow ? Math.sin((time + pixel.delay) / 260) * 0.35 : 0;
         pixel.size += (target + shimmer - pixel.size) * 0.11;
 
@@ -202,7 +199,7 @@ export function PixelButton({
         {text}
       </span>
 
-      <style jsx>{`
+      <style>{`
         .pixel-button {
           position: relative;
           isolation: isolate;

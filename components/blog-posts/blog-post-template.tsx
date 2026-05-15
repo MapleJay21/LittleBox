@@ -1,5 +1,7 @@
 "use client";
 
+import { Link } from "react-router-dom";
+
 type BlogPostTemplateProps = {
   title: string;
 };
@@ -10,11 +12,11 @@ export function BlogPostTemplate({ title }: BlogPostTemplateProps) {
       <link rel="stylesheet" href="/tokyo/tokyo.css" />
       <div className="header-section">
         <div className="w-container">
-          <a href="/example" className="blog-home-link w-inline-block">
+          <Link to="/example" className="blog-home-link w-inline-block">
             <h1 className="blog-name">TOKYO</h1>
-          </a>
+          </Link>
           <div className="navigation-bar">
-            <a href="/example" className="nav-link">blog</a>
+            <Link to="/example" className="nav-link">blog</Link>
             <a href="#" className="nav-link">about</a>
           </div>
         </div>
