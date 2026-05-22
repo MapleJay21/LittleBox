@@ -6,10 +6,12 @@ type BlogPostTemplateProps = {
   title: string;
 };
 
+const tokyoAsset = (name: string) => `${import.meta.env.BASE_URL}tokyo/${name}`;
+
 export function BlogPostTemplate({ title }: BlogPostTemplateProps) {
   return (
     <>
-      <link rel="stylesheet" href="/tokyo/tokyo.css" />
+      <link rel="stylesheet" href={tokyoAsset("tokyo.css")} />
       <div className="header-section">
         <div className="w-container">
           <Link to="/example" className="blog-home-link w-inline-block">
@@ -23,7 +25,7 @@ export function BlogPostTemplate({ title }: BlogPostTemplateProps) {
       </div>
       <div className="section">
         <div className="w-container">
-          <img alt="" src="/tokyo/5e4b1ad5ea2f4655f5e99668_photo-1443610662308-74e383d24fbe.jpg" className="main-image" />
+          <img alt="" src={tokyoAsset("5e4b1ad5ea2f4655f5e99668_photo-1443610662308-74e383d24fbe.jpg")} className="main-image" />
           <h1 data-w-expand="category" className="post-heading">{title === "Blog Post One" ? "Soaking in the colors" : title === "Blog Post Two" ? "Soaking in the colors" : "Soaking in the colors"}</h1>
           <div className="byline-wrapper">
             <div className="byline-text">October 1, 2015</div>
@@ -47,9 +49,9 @@ export function BlogPostTemplate({ title }: BlogPostTemplateProps) {
       <div className="footer">
         <div className="w-container">
           <div>
-            <a href="#" className="social-icon-link w-inline-block"><img src="/tokyo/5e4b1ad5ea2f467cbee996de_social-03.svg" width="20" alt="" /></a>
-            <a href="#" className="social-icon-link w-inline-block"><img src="/tokyo/5e4b1ad5ea2f46c54ee99695_social-18.svg" width="20" alt="" /></a>
-            <a href="#" className="social-icon-link w-inline-block"><img src="/tokyo/5e4b1ad5ea2f464178e996fd_social-30.svg" width="20" alt="" /></a>
+            <a href="#" className="social-icon-link w-inline-block"><img src={tokyoAsset("5e4b1ad5ea2f467cbee996de_social-03.svg")} width="20" alt="" /></a>
+            <a href="#" className="social-icon-link w-inline-block"><img src={tokyoAsset("5e4b1ad5ea2f46c54ee99695_social-18.svg")} width="20" alt="" /></a>
+            <a href="#" className="social-icon-link w-inline-block"><img src={tokyoAsset("5e4b1ad5ea2f464178e996fd_social-30.svg")} width="20" alt="" /></a>
           </div>
           <div className="footer-text">Powered by Webflow</div>
         </div>

@@ -16,7 +16,7 @@ export function AppLayout() {
       return
     }
     setOverlayVisible(false)
-  }, [location.pathname])
+  }, [location.pathname, location.search, location.hash])
 
   useEffect(() => {
     return () => {
@@ -26,29 +26,56 @@ export function AppLayout() {
     }
   }, [])
 
-  const handleClickCapture = (event: MouseEvent<HTMLElement>) => {
-    const target = event.target as HTMLElement
-    const anchor = target.closest("a[href]") as HTMLAnchorElement | null
-    if (!anchor) return
-    if (anchor.target === "_blank") return
-    if (anchor.hasAttribute("download")) return
+  const navigateWithOverlay = (to: string) => {
+    const currentRoute = `${location.pathname}${location.search}${location.hash}`
+    if (to === currentRoute) return
 
-    const url = new URL(anchor.href, window.location.href)
-    if (url.origin !== window.location.origin) return
-    if (url.pathname === location.pathname && url.search === location.search) return
-
-    event.preventDefault()
     setOverlayVisible(true)
     if (timerRef.current !== null) {
       window.clearTimeout(timerRef.current)
     }
     timerRef.current = window.setTimeout(() => {
-      navigate(`${url.pathname}${url.search}${url.hash}`)
+      navigate(to)
     }, 700)
   }
 
+  const routeFromHref = (href: string) => {
+    if (href === "#" || href.startsWith("#!")) return null
+    const url = new URL(href, window.location.href)
+    if (url.origin !== window.location.origin) return null
+
+    if (url.hash.startsWith("#/")) {
+      return url.hash.slice(1)
+    }
+
+    return `${url.pathname}${url.search}${url.hash}`
+  }
+
+  const handleClickCapture = (event: MouseEvent<HTMLElement>) => {
+    const target = event.target as HTMLElement
+
+    const navTarget = target.closest("[data-nav-to]") as HTMLElement | null
+    if (navTarget) {
+      const to = navTarget.getAttribute("data-nav-to")
+      if (!to) return
+      event.preventDefault()
+      navigateWithOverlay(to)
+      return
+    }
+
+    const anchor = target.closest("a[href]") as HTMLAnchorElement | null
+    if (!anchor) return
+    if (anchor.target === "_blank") return
+    if (anchor.hasAttribute("download")) return
+
+    const to = routeFromHref(anchor.href)
+    if (!to) return
+    event.preventDefault()
+    navigateWithOverlay(to)
+  }
+
   return (
-    <div onClickCapture={handleClickCapture}>
+    <div onClickCapture={handleClickCapture} className="min-h-screen">
       <AnimatePresence>
         {overlayVisible && (
           <motion.div
@@ -84,27 +111,15 @@ export function AppLayout() {
                   transition={{ duration: 0.7, ease: "linear" }}
                 />
               </motion.svg>
-              <span className="text-2xl text-white">􀣺</span>
+              <span className="text-2xl text-white">...</span>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <AnimatePresence mode="wait">
-        <motion.main
-          key={location.pathname}
-          initial={{ opacity: 1, y: 8, scale: 1.005, filter: "blur(1px)" }}
-          animate={{ opacity: 1, y: 0, scale: 1, filter: "blur(0px)" }}
-          exit={{ opacity: 1, y: -6, scale: 0.997, filter: "blur(1px)" }}
-          transition={{
-            duration: 0.55,
-            ease: [0.22, 1, 0.36, 1],
-          }}
-          className="page-wrap"
-        >
-          <Outlet />
-        </motion.main>
-      </AnimatePresence>
+      <main className="page-wrap min-h-screen">
+        <Outlet />
+      </main>
     </div>
   )
 }

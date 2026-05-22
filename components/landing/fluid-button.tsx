@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 type FluidButtonProps = {
   text: string;
   onClick?: () => void;
+  navTo?: string;
   className?: string;
   firstTextColor?: string;
   secondTextColor?: string;
@@ -14,6 +15,7 @@ type FluidButtonProps = {
 export function FluidButton({
   text,
   onClick,
+  navTo,
   className,
   firstTextColor = "rgb(250, 250, 250)",
   secondTextColor = "rgb(1, 1, 1)",
@@ -25,6 +27,7 @@ export function FluidButton({
     <button
       type="button"
       onClick={onClick}
+      data-nav-to={navTo}
       className={`fluid-button ${className ?? ""}`.trim()}
       style={
         {

@@ -1,10 +1,10 @@
-import { createBrowserRouter } from "react-router-dom"
+import { createHashRouter } from "react-router-dom"
 import { AppLayout } from "./ui/AppLayout"
 import { HomePage } from "./views/HomePage"
 import { ExamplePage } from "./views/ExamplePage"
 import { BlogOnePage, BlogTwoPage, BlogThreePage } from "./views/BlogPages"
 
-export const router = createBrowserRouter([
+export const router = createHashRouter([
   {
     path: "/",
     element: <AppLayout />,

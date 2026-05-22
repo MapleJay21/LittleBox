@@ -82,6 +82,10 @@ export function WebglParticleText({
 
       const { width, height } = canvas;
       const dpr = dprRef.current;
+      const padding = Math.ceil(
+        (Math.max(maxDrift, particleSize, 1) + Math.max(mouseForce, 1)) * dpr * 6,
+      );
+      const maxTextWidth = Math.max(1, width - padding * 2);
       const sampleCanvas = document.createElement("canvas");
       sampleCanvas.width = width;
       sampleCanvas.height = height;
@@ -92,7 +96,14 @@ export function WebglParticleText({
       sampleCtx.fillStyle = "#fff";
       sampleCtx.textAlign = "center";
       sampleCtx.textBaseline = "middle";
-      sampleCtx.font = `${fontWeight} ${fontSize * dpr}px ${fontFamily}`;
+      const baseFontSize = fontSize * dpr;
+      sampleCtx.font = `${fontWeight} ${baseFontSize}px ${fontFamily}`;
+      const metrics = sampleCtx.measureText(text);
+      const measuredWidth =
+        metrics.actualBoundingBoxLeft + metrics.actualBoundingBoxRight || metrics.width;
+      const fittedFontSize =
+        measuredWidth > maxTextWidth ? baseFontSize * (maxTextWidth / measuredWidth) : baseFontSize;
+      sampleCtx.font = `${fontWeight} ${fittedFontSize}px ${fontFamily}`;
       sampleCtx.fillText(text, width / 2, height / 2);
 
       const image = sampleCtx.getImageData(0, 0, width, height).data;
@@ -235,5 +246,11 @@ export function WebglParticleText({
     text,
   ]);
 
-  return <canvas ref={canvasRef} className={className} aria-label={text} />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className={["block h-full w-full", className].filter(Boolean).join(" ")}
+      aria-label={text}
+    />
+  );
 }

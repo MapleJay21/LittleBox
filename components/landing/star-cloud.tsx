@@ -23,9 +23,11 @@ type StarCloudProps = {
   starCount?: number;
   starSize?: number;
   starColor?: string;
-  cloudSize?: number;
-  baseSpeed?: number;
+  depth?: number;
+  speed?: number;
+  spread?: number;
   variant?: "desktop" | "phone";
+  backgroundColor?: string;
 };
 
 export function StarCloud({
@@ -35,25 +37,32 @@ export function StarCloud({
   starCount = 200,
   starSize = 2,
   starColor = "#FFFFFF",
-  cloudSize = 1000,
-  baseSpeed = 1,
+  depth = 1000,
+  speed = 1,
+  spread = 1.35,
   variant = "desktop",
+  backgroundColor = "#000000",
 }: StarCloudProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | null>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const centerRef = useRef({ x: 0, y: 0 });
+  const boundsRef = useRef({ x: 600, y: 400 });
   const [stars, setStars] = useState<Star[]>([]);
+  const [sizeTick, setSizeTick] = useState(0);
 
   const initialStars = useMemo(
-    () =>
-      Array.from({ length: starCount }, (_, i) => ({
-        x: (Math.random() - 0.5) * cloudSize,
-        y: (Math.random() - 0.5) * cloudSize,
-        z: Math.random() * cloudSize,
+    () => {
+      const maxX = boundsRef.current.x;
+      const maxY = boundsRef.current.y;
+      return Array.from({ length: starCount }, (_, i) => ({
+        x: (Math.random() - 0.5) * maxX * 2,
+        y: (Math.random() - 0.5) * maxY * 2,
+        z: Math.random() * depth,
         id: i,
-      })),
-    [cloudSize, starCount],
+      }));
+    },
+    [depth, sizeTick, starCount],
   );
 
   useEffect(() => {
@@ -65,17 +74,22 @@ export function StarCloud({
       if (!containerRef.current) return;
 
       const rect = containerRef.current.getBoundingClientRect();
+      boundsRef.current = {
+        x: Math.max(200, (rect.width * spread) / 2),
+        y: Math.max(200, (rect.height * spread) / 2),
+      };
       centerRef.current = {
         x: rect.left + rect.width / 2,
         y: rect.top + rect.height / 2,
       };
+      setSizeTick((prev) => prev + 1);
     };
 
     updateCenter();
     window.addEventListener("resize", updateCenter);
 
     return () => window.removeEventListener("resize", updateCenter);
-  }, []);
+  }, [spread]);
 
   useEffect(() => {
     if (variant === "phone") return;
@@ -94,9 +108,11 @@ export function StarCloud({
       let moveX = 0;
       let moveY = 0;
       let moveZ = 0;
+      const maxX = boundsRef.current.x;
+      const maxY = boundsRef.current.y;
 
       if (variant === "phone") {
-        moveZ = baseSpeed * 10;
+        moveZ = speed * 10;
       } else {
         const mouse = mouseRef.current;
         const center = centerRef.current;
@@ -107,19 +123,19 @@ export function StarCloud({
         const transitionZone = 150;
 
         if (distance < centerZone) {
-          moveZ = baseSpeed * 10;
+          moveZ = speed * 10;
         } else if (distance < centerZone + transitionZone) {
           const blendFactor = (distance - centerZone) / transitionZone;
           const easedBlend = blendFactor * blendFactor * (3 - 2 * blendFactor);
-          moveZ = baseSpeed * 10 * (1 - easedBlend);
+          moveZ = speed * 10 * (1 - easedBlend);
 
-          const directionalSpeed = baseSpeed * (1200 / distance) * easedBlend;
+          const directionalSpeed = speed * (1200 / distance) * easedBlend;
           moveX = (-dx / distance) * directionalSpeed;
           moveY = (-dy / distance) * directionalSpeed;
         } else {
-          const speed = baseSpeed * (1200 / distance);
-          moveX = (-dx / distance) * speed;
-          moveY = (-dy / distance) * speed;
+          const directionalSpeed = speed * (1200 / distance);
+          moveX = (-dx / distance) * directionalSpeed;
+          moveY = (-dy / distance) * directionalSpeed;
         }
       }
 
@@ -130,12 +146,12 @@ export function StarCloud({
             let newY = star.y + moveY;
             let newZ = star.z + moveZ;
 
-            if (newX > cloudSize / 2) newX = -cloudSize / 2;
-            if (newX < -cloudSize / 2) newX = cloudSize / 2;
-            if (newY > cloudSize / 2) newY = -cloudSize / 2;
-            if (newY < -cloudSize / 2) newY = cloudSize / 2;
-            if (newZ > cloudSize) newZ = 0;
-            if (newZ < 0) newZ = cloudSize;
+            if (newX > maxX) newX = -maxX;
+            if (newX < -maxX) newX = maxX;
+            if (newY > maxY) newY = -maxY;
+            if (newY < -maxY) newY = maxY;
+            if (newZ > depth) newZ = 0;
+            if (newZ < 0) newZ = depth;
 
             return { ...star, x: newX, y: newY, z: newZ };
           }),
@@ -152,7 +168,7 @@ export function StarCloud({
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [baseSpeed, cloudSize, variant]);
+  }, [depth, speed, variant]);
 
   return (
     <div
@@ -160,7 +176,7 @@ export function StarCloud({
       style={{
         width,
         height,
-        backgroundColor: "#000000",
+        backgroundColor,
         overflow: "hidden",
         position: "relative",
         ...style,
@@ -171,7 +187,7 @@ export function StarCloud({
         const x = star.x * scale;
         const y = star.y * scale;
         const size = starSize * scale;
-        const opacity = Math.max(0.1, 1 - star.z / cloudSize);
+        const opacity = Math.max(0.1, 1 - star.z / depth);
 
         return (
           <div
